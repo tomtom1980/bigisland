@@ -770,6 +770,8 @@
             max-width: 85%;
             word-wrap: break-word;
             animation: fadeIn 0.3s ease;
+            line-height: 1.6;
+            white-space: pre-wrap;
         }
         
         @keyframes fadeIn {
@@ -3844,7 +3846,10 @@
                     // Add welcome message if this is first time opening
                     if (chatMessages.children.length === 0) {
                         const t = translations[currentLanguage];
-                        addMessage('assistant', t.chatWelcome);
+                        const welcomeMsg = currentLanguage === 'en' ? 
+                            "🌺 Aloha! I'm your Big Island travel assistant.\n\nI can help with:\n• Weather & sea temperatures\n• Restaurant reservations\n• Beach recommendations\n• Volcano updates\n• Flight details\n• Activity schedules\n• Local tips\n\nAsk me anything about your Nov 29 - Dec 6 trip!" :
+                            "🌺 Aloha! Nagy-Sziget utazási asszisztensed vagyok.\n\nSegíthetek:\n• Időjárás & tenger hőmérséklet\n• Étterem foglalások\n• Strand ajánlások\n• Vulkán frissítések\n• Repülés részletek\n• Tevékenység ütemezések\n• Helyi tippek\n\nKérdezz bármit a Nov 29 - Dec 6 utazásodról!";
+                        addMessage('assistant', welcomeMsg);
                     }
                 }
             });
@@ -3857,7 +3862,11 @@
             function addMessage(role, content) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `chat-message ${role}`;
-                messageDiv.textContent = content;
+                
+                // Convert line breaks to <br> for proper display
+                const formattedContent = content.replace(/\n/g, '<br>');
+                messageDiv.innerHTML = formattedContent;
+                
                 chatMessages.appendChild(messageDiv);
                 
                 // Scroll to bottom immediately
@@ -3892,12 +3901,56 @@
                     setTimeout(() => {
                         typingIndicator.classList.remove('active');
                         const response = currentLanguage === 'en' ? 
-                            "💕 Jess is Tomi's love! She's the special person who makes every adventure more meaningful. 🌺" :
-                            "💕 Jess Tomi szerelme! Ő az a különleges személy, aki minden kalandot jelentősebbé tesz. 🌺";
+                            "💕 About Jess:\n• Jess is Tomi's love\n• She's the special person who makes every adventure more meaningful\n• The most important person in Tomi's life 🌺" :
+                            "💕 Jess-ről:\n• Jess Tomi szerelme\n• Ő az a különleges személy, aki minden kalandot jelentősebbé tesz\n• A legfontosabb személy Tomi életében 🌺";
                         addMessage('assistant', response);
                         chatSend.disabled = false;
                         chatInput.focus();
                     }, 1000);
+                    return;
+                }
+                
+                // Check for common questions and provide bullet-point responses
+                const lowerMessage = message.toLowerCase();
+                let quickResponse = "";
+                
+                if (lowerMessage.includes('volcano') || lowerMessage.includes('vulkán')) {
+                    quickResponse = currentLanguage === 'en' ? 
+                        "🌋 Volcano Status:\n• Kīlauea is currently ERUPTING!\n• Active lava fountaining in episodes\n• December 1 visit: may see active lava\n• Check USGS webcams for live views\n• Park remains open during eruptions\n• Bring layers - cooler at elevation" :
+                        "🌋 Vulkán Státusz:\n• Kīlauea jelenleg KITÖR!\n• Aktív láva szökőkutak epizódokban\n• December 1 látogatás: láthatsz aktív lávát\n• Nézd USGS webkamerákat élő képekért\n• Park nyitva marad kitörések alatt\n• Vigyél rétegeket - hűvösebb magasságban";
+                } else if (lowerMessage.includes('weather') || lowerMessage.includes('időjárás')) {
+                    quickResponse = currentLanguage === 'en' ? 
+                        "☀️ Weather Info:\n• Kona side: 26-28°C, dry & sunny\n• Hilo side: 22-24°C, more rain\n• Sea temperature: 25-26°C\n• Mauna Kea: Cold! Bring warm clothes\n• Volcano Park: 15-20°C, bring layers\n• Best beach weather: mornings" :
+                        "☀️ Időjárás Info:\n• Kona oldal: 26-28°C, száraz & napos\n• Hilo oldal: 22-24°C, több eső\n• Tenger hőmérséklet: 25-26°C\n• Mauna Kea: Hideg! Vigyél meleg ruhákat\n• Vulkán Park: 15-20°C, vigyél rétegeket\n• Legjobb strand idő: reggelek";
+                } else if (lowerMessage.includes('restaurant') || lowerMessage.includes('étterem')) {
+                    quickResponse = currentLanguage === 'en' ? 
+                        "🍽️ Restaurant Reservations:\n• Nov 30: Merriman's @ 8pm ✅\n• Dec 1: 'Ulu Ocean Grill @ 8pm ✅\n• Dec 2: CanoeHouse @ 7:30pm ✅\n• Dec 3: Tommy Bahama @ 7pm\n• Dec 4: Moon and Turtle @ 6:30pm\n• Dec 5: Roy's Waikoloa @ 7:30pm ✅\n• Check Google Maps link for all locations" :
+                        "🍽️ Étterem Foglalások:\n• Nov 30: Merriman's @ 20:00 ✅\n• Dec 1: 'Ulu Ocean Grill @ 20:00 ✅\n• Dec 2: CanoeHouse @ 19:30 ✅\n• Dec 3: Tommy Bahama @ 19:00\n• Dec 4: Moon and Turtle @ 18:30\n• Dec 5: Roy's Waikoloa @ 19:30 ✅\n• Nézd Google Maps linket minden helyért";
+                } else if (lowerMessage.includes('beach') || lowerMessage.includes('strand')) {
+                    quickResponse = currentLanguage === 'en' ? 
+                        "🏖️ Best Beaches:\n• Hapuna Beach - Best for swimming\n• Magic Sands - Great for boogie boarding\n• Two Step - Best snorkeling\n• Makalawena - Most pristine (hike required)\n• Kiholo Bay - Sea turtle paradise\n• Green Sand Beach - Unique adventure\n• Punalu'u - Black sand & turtles" :
+                        "🏖️ Legjobb Strandok:\n• Hapuna Beach - Legjobb úszáshoz\n• Magic Sands - Nagyszerű boogie board-hoz\n• Two Step - Legjobb snorkelezés\n• Makalawena - Legérintetlenebb (túra kell)\n• Kiholo Bay - Teknős paradicsom\n• Green Sand Beach - Egyedi kaland\n• Punalu'u - Fekete homok & teknősök";
+                } else if (lowerMessage.includes('flight') || lowerMessage.includes('repülés')) {
+                    quickResponse = currentLanguage === 'en' ? 
+                        "✈️ Flight Schedule:\n• Nov 26: VN133 DAD→SGN (EC85JH)\n• Nov 27: PR592/100 SGN→HNL (XKXI4Q)\n• Nov 29: WN2839 HNL→KOA (AKISE6)\n• Dec 6: WN3098 KOA→HNL (AKISE6)\n• Dec 7: PR101 HNL→MNL (ZD3KIF)\n• Car: Alamo #1387477087" :
+                        "✈️ Repülési Menetrend:\n• Nov 26: VN133 DAD→SGN (EC85JH)\n• Nov 27: PR592/100 SGN→HNL (XKXI4Q)\n• Nov 29: WN2839 HNL→KOA (AKISE6)\n• Dec 6: WN3098 KOA→HNL (AKISE6)\n• Dec 7: PR101 HNL→MNL (ZD3KIF)\n• Autó: Alamo #1387477087";
+                } else if (lowerMessage.includes('tips') || lowerMessage.includes('tipp')) {
+                    quickResponse = currentLanguage === 'en' ? 
+                        "💡 Essential Tips:\n• Reef-safe sunscreen only (law!)\n• Keep 20ft from turtles/seals\n• Book dinner reservations early\n• Download offline maps\n• Bring reusable water bottles\n• Cash for farmers markets\n• Layers for volcano/Mauna Kea\n• Fill gas before long drives" :
+                        "💡 Fontos Tippek:\n• Csak korallbarát naptejet (törvény!)\n• Tarts 20ft távolságot teknősöktől\n• Foglalj éttermet korán\n• Töltsd le offline térképeket\n• Vigyél újrahasználható palackokat\n• Készpénz farmers market-re\n• Rétegek vulkánhoz/Mauna Kea-hoz\n• Tankolj hosszú utak előtt";
+                } else {
+                    quickResponse = currentLanguage === 'en' ? 
+                        "🌺 I can help with:\n• Weather & sea temperatures\n• Restaurant reservations\n• Beach recommendations\n• Volcano status updates\n• Activity schedules\n• Flight confirmations\n• Driving directions\n• Local tips & advice\n\nWhat would you like to know?" :
+                        "🌺 Segíthetek ezekkel:\n• Időjárás & tengervíz hőmérséklet\n• Étterem foglalások\n• Strand ajánlások\n• Vulkán státusz frissítések\n• Tevékenység ütemezések\n• Repülés megerősítések\n• Vezetési irányok\n• Helyi tippek & tanácsok\n\nMit szeretnél tudni?";
+                }
+                
+                if (quickResponse) {
+                    setTimeout(() => {
+                        typingIndicator.classList.remove('active');
+                        addMessage('assistant', quickResponse);
+                        chatSend.disabled = false;
+                        chatInput.focus();
+                    }, 1500);
                     return;
                 }
                 
