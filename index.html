@@ -4015,28 +4015,15 @@
                         ? 'Please respond in Hungarian language.' 
                         : 'Please respond in English language.';
                     
-                    const prompt = `You are a knowledgeable Big Island Hawaii travel expert. Answer questions DIRECTLY with specific, actionable information.
+                    const prompt = `${message}
 
 ${languageInstruction}
 
-USER QUESTION: ${message}
-
-RULES:
-1. ONLY answer questions about Big Island Hawaii. For off-topic questions, say: "I can only help with Big Island Hawaii questions."
-2. Give DIRECT answers with specific names, locations, and details - NOT descriptions of what you will search for.
-3. Use your Google Search capability to find current information, then PRESENT THE RESULTS directly.
-4. Format temperatures in Celsius (°C).
-
-RESPONSE FORMAT:
-- Start with a direct answer
-- List 3-5 specific recommendations with names and brief descriptions
-- Include practical details (location, what makes it special)
-- Be helpful and concise
-
-ITINERARY CONTEXT (for reference):
-${context}
-
-Remember: Provide the ACTUAL answer with real place names and details, not a description of your search process.`;
+You are a Big Island Hawaii travel expert for a trip Nov 29 - Dec 6, 2025.
+- ONLY answer Big Island Hawaii questions. Reject other topics.
+- Give specific names, addresses, and recommendations immediately.
+- NEVER say "I will search" - just provide the answer directly.
+- Use Celsius for temperatures.`;
                     
                     // Call Gemini API with Google Search grounding
                     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
@@ -4093,13 +4080,23 @@ Remember: Provide the ACTUAL answer with real place names and details, not a des
                         throw new Error('Unexpected API response format');
                     }
                     
-                    const aiResponse = data.candidates[0].content.parts[0].text;
-                    
+                    // Log full response for debugging
+                    console.log('Gemini API Response:', JSON.stringify(data, null, 2));
+
+                    // Combine all text parts from the response
+                    let aiResponse = '';
+                    const parts = data.candidates[0].content.parts;
+                    for (const part of parts) {
+                        if (part.text) {
+                            aiResponse += part.text;
+                        }
+                    }
+
                     // Hide typing indicator
                     typingIndicator.classList.remove('active');
-                    
+
                     // Add AI response
-                    addMessage('assistant', aiResponse);
+                    addMessage('assistant', aiResponse || 'No response received.');
                     
                 } catch (error) {
                     console.error('Error calling Gemini API:', error);
