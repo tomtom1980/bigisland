@@ -914,7 +914,42 @@
         .lang-btn:hover:not(.active) {
             background: #f0f0f0;
         }
-        
+
+        /* Claude Code Icon */
+        .claude-code-icon {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+            padding: 10px 18px;
+            border-radius: 30px;
+            box-shadow: 0 4px 20px rgba(217, 119, 6, 0.4);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .claude-code-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(217, 119, 6, 0.5);
+        }
+
+        .claude-code-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .claude-code-icon span {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
         @media (max-width: 768px) {
             .language-toggle {
                 top: 10px;
@@ -931,10 +966,28 @@
                 right: 20px;
                 bottom: 20px;
             }
+
+            .claude-code-icon {
+                top: 10px;
+                left: 10px;
+                padding: 8px 12px;
+            }
+
+            .claude-code-icon span {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Claude Code Icon -->
+    <a href="https://claude.ai" target="_blank" class="claude-code-icon" title="Built with Claude Code">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+        </svg>
+        <span>Claude Code</span>
+    </a>
+
     <!-- Language Toggle -->
     <div class="language-toggle">
         <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">🇺🇸 English</button>
@@ -3812,7 +3865,7 @@
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
             const GEMINI_API_KEY = 'AIzaSyAADVKHl9JHlikfZS0uQeYN6MgRZJAHjw4';
-            const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-03-25:generateContent';
+            const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
             
             // Extract itinerary context from the page
             function getItineraryContext() {
