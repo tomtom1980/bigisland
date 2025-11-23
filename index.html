@@ -3865,7 +3865,7 @@
         // Wait for DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function() {
             const GEMINI_API_KEY = 'AIzaSyDA-odno12vI9NendBthMccpRURk0oiGSQ';
-            const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+            const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
             
             // Extract itinerary context from the page
             function getItineraryContext() {
@@ -4015,40 +4015,28 @@
                         ? 'Please respond in Hungarian language.' 
                         : 'Please respond in English language.';
                     
-                    const prompt = `You are a helpful travel assistant EXCLUSIVELY for a Big Island Hawaii trip scheduled for November 29 - December 6, 2025. You have access to the complete itinerary AND you MUST automatically search the internet for any real-time information.
+                    const prompt = `You are a knowledgeable Big Island Hawaii travel expert. Answer questions DIRECTLY with specific, actionable information.
 
 ${languageInstruction}
 
-ITINERARY CONTEXT:
-${context}
-
 USER QUESTION: ${message}
 
-SCOPE RESTRICTION - CRITICAL:
-- You ONLY answer questions about Big Island Hawaii (the island of Hawaii)
-- You ONLY answer questions related to this specific trip (Nov 29 - Dec 6, 2025)
-- If the question is NOT about Big Island Hawaii, respond with: "This question is not supported. I can only help with questions about your Big Island Hawaii trip."
-- Examples of OFF-TOPIC questions to reject: other Hawaiian islands (Maui, Oahu, Kauai), other destinations, general knowledge, politics, etc.
-- Examples of ON-TOPIC questions: Big Island weather, volcano, restaurants, activities, hotels, beaches, driving directions, local tips
+RULES:
+1. ONLY answer questions about Big Island Hawaii. For off-topic questions, say: "I can only help with Big Island Hawaii questions."
+2. Give DIRECT answers with specific names, locations, and details - NOT descriptions of what you will search for.
+3. Use your Google Search capability to find current information, then PRESENT THE RESULTS directly.
+4. Format temperatures in Celsius (°C).
 
-CRITICAL INSTRUCTIONS - AUTOMATIC GOOGLE SEARCH:
-- ALWAYS search the internet for: current weather, weather forecasts, volcano activity status, real-time conditions, restaurant reviews, current prices, operating hours, road conditions
-- For weather questions: Search Google immediately for "Big Island Hawaii weather forecast [specific location]" or "Waimea Hawaii weather [date]"
-- For volcano questions: Search Google for "Kilauea volcano current status" or "Hawaii Volcanoes National Park eruption update"
-- For restaurant/business questions: Search for current reviews, hours, and availability
-- When you search, explicitly mention that you searched Google for the latest information
-- For questions about the itinerary itself (times, bookings, addresses from the context above): use the itinerary context provided
-- Combine itinerary knowledge with real-time Google search results for comprehensive answers
-- Always provide accurate, up-to-date information by searching when needed
-- Keep responses concise but complete
+RESPONSE FORMAT:
+- Start with a direct answer
+- List 3-5 specific recommendations with names and brief descriptions
+- Include practical details (location, what makes it special)
+- Be helpful and concise
 
-TEMPERATURE FORMAT:
-- ALWAYS report temperatures in Celsius (°C)
-- If you find temperatures in Fahrenheit, convert them to Celsius
-- Use format like: "25°C" or "25-30°C" for ranges
-- Example: "The temperature will be around 24°C with partly cloudy skies"
+ITINERARY CONTEXT (for reference):
+${context}
 
-Remember: If the answer requires current/live data (weather, volcano, traffic, hours, reviews), you MUST search Google automatically - don't just use your training data.`;
+Remember: Provide the ACTUAL answer with real place names and details, not a description of your search process.`;
                     
                     // Call Gemini API with Google Search grounding
                     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
@@ -4084,10 +4072,10 @@ Remember: If the answer requires current/live data (weather, volcano, traffic, h
                                 }
                             ],
                             generationConfig: {
-                                temperature: 0.7,
+                                temperature: 0.8,
                                 topK: 40,
                                 topP: 0.95,
-                                maxOutputTokens: 2048
+                                maxOutputTokens: 4096
                             }
                         })
                     });
