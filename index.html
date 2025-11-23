@@ -3890,6 +3890,9 @@
                 console.error('Chat elements not found');
                 return;
             }
+
+            // Conversation history for context
+            let conversationHistory = [];
             
             // Toggle chat window
             chatButton.addEventListener('click', () => {
@@ -4011,20 +4014,38 @@
                     const context = getItineraryContext();
                     
                     // Prepare the prompt with context
-                    const languageInstruction = currentLanguage === 'hu' 
-                        ? 'Please respond in Hungarian language.' 
+                    const languageInstruction = currentLanguage === 'hu'
+                        ? 'Please respond in Hungarian language.'
                         : 'Please respond in English language.';
-                    
-                    const prompt = `${message}
 
-${languageInstruction}
+                    const systemPrompt = `${languageInstruction}
 
 You are a Big Island Hawaii travel expert for a trip Nov 29 - Dec 6, 2025.
 - ONLY answer Big Island Hawaii questions. Reject other topics.
 - Give specific names, addresses, and recommendations immediately.
 - NEVER say "I will search" - just provide the answer directly.
-- Use Celsius for temperatures.`;
-                    
+- Use Celsius for temperatures.
+- Remember the conversation context from previous messages.`;
+
+                    // Add user message to conversation history
+                    conversationHistory.push({
+                        role: 'user',
+                        parts: [{ text: message }]
+                    });
+
+                    // Build contents with system instruction + conversation history
+                    const contents = [
+                        {
+                            role: 'user',
+                            parts: [{ text: systemPrompt }]
+                        },
+                        {
+                            role: 'model',
+                            parts: [{ text: 'I understand. I am your Big Island Hawaii travel expert. How can I help you?' }]
+                        },
+                        ...conversationHistory
+                    ];
+
                     // Call Gemini API with Google Search grounding
                     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
                         method: 'POST',
@@ -4032,11 +4053,7 @@ You are a Big Island Hawaii travel expert for a trip Nov 29 - Dec 6, 2025.
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({
-                            contents: [{
-                                parts: [{
-                                    text: prompt
-                                }]
-                            }],
+                            contents: contents,
                             tools: [{
                                 google_search: {}
                             }],
@@ -4092,6 +4109,19 @@ You are a Big Island Hawaii travel expert for a trip Nov 29 - Dec 6, 2025.
                         }
                     }
 
+                    // Add assistant response to conversation history
+                    if (aiResponse) {
+                        conversationHistory.push({
+                            role: 'model',
+                            parts: [{ text: aiResponse }]
+                        });
+                    }
+
+                    // Limit conversation history to last 10 exchanges to avoid token limits
+                    if (conversationHistory.length > 20) {
+                        conversationHistory = conversationHistory.slice(-20);
+                    }
+
                     // Hide typing indicator
                     typingIndicator.classList.remove('active');
 
@@ -4101,7 +4131,10 @@ You are a Big Island Hawaii travel expert for a trip Nov 29 - Dec 6, 2025.
                 } catch (error) {
                     console.error('Error calling Gemini API:', error);
                     typingIndicator.classList.remove('active');
-                    
+
+                    // Remove the failed user message from history
+                    conversationHistory.pop();
+
                     // More detailed error message
                     let errorMsg = '🌺 Sorry, I encountered an error: ' + error.message;
                     if (error.message.includes('fetch')) {
