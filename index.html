@@ -3988,14 +3988,13 @@
                         "✈️ Flight Schedule:\n• Nov 26: VN133 DAD→SGN (EC85JH)\n• Nov 27: PR592/100 SGN→HNL (XKXI4Q)\n• Nov 29: WN2839 HNL→KOA (AKISE6)\n• Dec 6: WN3098 KOA→HNL (AKISE6)\n• Dec 7: PR101 HNL→MNL (ZD3KIF)\n• Car: Alamo #1387477087" :
                         "✈️ Repülési Menetrend:\n• Nov 26: VN133 DAD→SGN (EC85JH)\n• Nov 27: PR592/100 SGN→HNL (XKXI4Q)\n• Nov 29: WN2839 HNL→KOA (AKISE6)\n• Dec 6: WN3098 KOA→HNL (AKISE6)\n• Dec 7: PR101 HNL→MNL (ZD3KIF)\n• Autó: Alamo #1387477087";
                 } else if (lowerMessage.includes('tips') || lowerMessage.includes('tipp')) {
-                    quickResponse = currentLanguage === 'en' ? 
+                    quickResponse = currentLanguage === 'en' ?
                         "💡 Essential Tips:\n• Reef-safe sunscreen only (law!)\n• Keep 20ft from turtles/seals\n• Book dinner reservations early\n• Download offline maps\n• Bring reusable water bottles\n• Cash for farmers markets\n• Layers for volcano/Mauna Kea\n• Fill gas before long drives" :
                         "💡 Fontos Tippek:\n• Csak korallbarát naptejet (törvény!)\n• Tarts 20ft távolságot teknősöktől\n• Foglalj éttermet korán\n• Töltsd le offline térképeket\n• Vigyél újrahasználható palackokat\n• Készpénz farmers market-re\n• Rétegek vulkánhoz/Mauna Kea-hoz\n• Tankolj hosszú utak előtt";
-                } else {
-                    quickResponse = currentLanguage === 'en' ? 
-                        "🌺 I can help with:\n• Weather & sea temperatures\n• Restaurant reservations\n• Beach recommendations\n• Volcano status updates\n• Activity schedules\n• Flight confirmations\n• Driving directions\n• Local tips & advice\n\nWhat would you like to know?" :
-                        "🌺 Segíthetek ezekkel:\n• Időjárás & tengervíz hőmérséklet\n• Étterem foglalások\n• Strand ajánlások\n• Vulkán státusz frissítések\n• Tevékenység ütemezések\n• Repülés megerősítések\n• Vezetési irányok\n• Helyi tippek & tanácsok\n\nMit szeretnél tudni?";
                 }
+
+                // Only return quick response if a keyword was matched
+                // Otherwise, let it fall through to Gemini API for general Big Island questions
                 
                 if (quickResponse) {
                     setTimeout(() => {
