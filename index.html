@@ -3930,19 +3930,12 @@
             }
         };
         
-        // Get current language - DEFAULT TO ENGLISH
-        let currentLanguage = 'en';  // Always start with English
-        
-        // Check localStorage only after page loads
-        const savedLanguage = localStorage.getItem('preferredLanguage');
-        if (savedLanguage) {
-            currentLanguage = savedLanguage;
-        }
-        
-        // Set language function
+        // Get current language - ALWAYS DEFAULT TO ENGLISH
+        let currentLanguage = 'en';  // Always start with English on page load
+
+        // Set language function - only changes when user clicks button
         function setLanguage(lang) {
             currentLanguage = lang;
-            localStorage.setItem('preferredLanguage', lang);
             
             // Update button states
             document.querySelectorAll('.lang-btn').forEach(btn => {
